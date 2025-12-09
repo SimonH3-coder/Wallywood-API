@@ -9,8 +9,8 @@ export const loginUser = async (email: string, password: string) => {
     where: { email },
     select: {
       id: true,
-      firstname: true,
-      lastname: true,
+      firstName: true,
+      lastName: true,
       email: true,
       password: true,
       role: true,
@@ -30,7 +30,7 @@ export const loginUser = async (email: string, password: string) => {
     {
       id: user.id,
       email: user.email,
-      fullname: `${user.firstname} ${user.lastname}`,
+      fullname: `${user.firstName} ${user.lastName}`,
       role: user.role,
     },
     JWT_SECRET,
