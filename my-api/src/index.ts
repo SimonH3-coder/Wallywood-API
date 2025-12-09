@@ -1,6 +1,11 @@
 import express from "express";
 import dotenv from "dotenv";
+import { cartlinesRoutes } from "./routes/cartlinesRoutes.js";
+import { genresRoutes } from "./routes/genresRoutes.js";
+import { posterRoutes } from "./routes/posterRoutes.js";
 import { userRoutes } from "./routes/userRoutes.js";
+import { userRatingsRoutes } from "./routes/userRatingsRoutes.js";
+import { loginRoutes } from "./routes/loginRoutes.js";
 
 // Indlæs miljøvirabler fra .env (uden at vise logs)
 dotenv.config({ quiet: true });
@@ -12,7 +17,12 @@ const Port = process.env.PORT || 3000;
 const app = express();
 
 // Tilføjer controller som middelware
+app.use("/api/cartlines", cartlinesRoutes);
+app.use("/api/genres", genresRoutes);
+app.use("/api/posters", posterRoutes);
+app.use("/api/userRatings", userRatingsRoutes);
 app.use("api/users", userRoutes);
+app.use("/api/login", loginRoutes);
 
 // Starter serveren
 app.listen(3000, () => {

@@ -1,10 +1,9 @@
 import { Request, Response } from "express";
 import { prisma } from "../prisma.js";
-import bcrypt from "bcrypt";
 
 export const getRecords = async (req: Request, res: Response) => {
   try {
-    const data = await prisma.user.findMany();
+    const data = await prisma.userRatings.findMany();
     res.json(data);
   } catch (error) {
     console.error(error);
@@ -26,7 +25,7 @@ export const getRecord = async (req: Request, res: Response) => {
   }
 
   try {
-    const data = await prisma.user.findUnique({
+    const data = await prisma.userRatings.findUnique({
       where: { id },
     });
     return res.status(200).json(data);
@@ -42,21 +41,18 @@ export const getRecord = async (req: Request, res: Response) => {
  */
 
 export const createRecord = async (req: Request, res: Response) => {
-  const { firstName, lastName, email, password, role, isActive } = req.body;
+  const { userId, posterId, numStars, createdAt } = req.body;
 
-  if (!firstName || !lastName || !email || !password || !role || !isActive) {
+  if (!userId || !posterId || !numStars || !createdAt) {
     return res.status(400).json({ error: "All data is required" });
   }
   try {
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const data = await prisma.user.create({
+    const data = await prisma.userRatings.create({
       data: {
-        firstName,
-        lastName,
-        email,
-        password: hashedPassword,
-        role,
-        isActive: Boolean(isActive),
+        userId: Number(userId),
+        posterId: Number(posterId),
+        numStars: Number(numStars),
+        createdAt: new Date(createdAt),
       },
     });
     res.status(201).json(data);
@@ -73,26 +69,24 @@ export const createRecord = async (req: Request, res: Response) => {
 
 export const updateRecord = async (req: Request, res: Response) => {
   const id = Number(req.params.id); // Sikrer at id er et tal
-  const { firstName, lastName, email, password, role, isActive } = req.body;
+  const { userId, posterId, numStars, createad } = req.body;
 
   if (!id) {
     return res.status(400).json({ error: "Id skal have en gyldig værdi" });
   }
 
-  if (!firstName || !lastName || !email || !password || !role || !isActive) {
+  if (!userId || !posterId || !numStars || !createad) {
     return res.status(400).json({ error: "Alle felter skal udfyldes" });
   }
 
   try {
-    const data = await prisma.user.update({
+    const data = await prisma.userRatings.update({
       where: { id },
       data: {
-        firstName,
-        lastName,
-        email,
-        password,
-        role,
-        isActive: Boolean(isActive),
+        userId: Number(userId),
+        posterId: Number(posterId),
+        numStars: Number(numStars),
+        createdAt: new Date(createad),
       },
     });
     res.status(201).json(data);
