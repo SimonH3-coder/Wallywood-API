@@ -6,6 +6,7 @@ import { posterRoutes } from "./routes/posterRoutes.js";
 import { userRoutes } from "./routes/userRoutes.js";
 import { userRatingsRoutes } from "./routes/userRatingsRoutes.js";
 import { loginRoutes } from "./routes/loginRoutes.js";
+import { authRoutes } from "./routes/authRoutes.js";
 
 // Indlæs miljøvirabler fra .env (uden at vise logs)
 dotenv.config({ quiet: true });
@@ -23,6 +24,7 @@ app.use("/api/posters", posterRoutes);
 app.use("/api/userRatings", userRatingsRoutes);
 app.use("api/users", userRoutes);
 app.use("/api/login", loginRoutes);
+app.use("/api/users", authRoutes);
 
 // Starter serveren
 app.listen(3000, () => {
