@@ -18,13 +18,6 @@ const Port = process.env.PORT || 3000;
 const app = express();
 
 // Tilføjer controller som middelware
-app.use("/api/cartlines", cartlinesRoutes);
-app.use("/api/genres", genresRoutes);
-app.use("/api/posters", posterRoutes);
-app.use("/api/userRatings", userRatingsRoutes);
-app.use("api/users", userRoutes);
-app.use("/api/login", loginRoutes);
-app.use("/api/users", authRoutes);
 
 // Starter serveren
 app.listen(3000, () => {
@@ -39,6 +32,12 @@ app.use(express.urlencoded({ extended: true }));
 
 // Brug vores user-routes under /api/users
 app.use("/api/users", userRoutes);
+app.use("/api/cartlines", cartlinesRoutes);
+app.use("/api/genres", genresRoutes);
+app.use("/api/posters", posterRoutes);
+app.use("/api/userRatings", userRatingsRoutes);
+app.use("/api/login", loginRoutes);
+app.use("/api/auth", authRoutes);
 
 //Start serveren
 app.listen(Port, () => {

@@ -4,7 +4,7 @@ import { create } from "domain";
 
 const router = Router();
 router.get("/", getRecords);
-router.get("/:id", getRecord);
+router.get("/:slug", getRecord);
 router.post("/", createRecord);
 router.put("/:id", updateRecord);
 router.delete("/:id", deleteRecord);

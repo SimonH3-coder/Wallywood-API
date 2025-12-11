@@ -108,4 +108,13 @@ export const deleteRecord = async (req: Request, res: Response) => {
   if (!id) {
     return res.status(400).json({ error: "Id is missing" });
   }
+  try {
+    await prisma.poster.delete({
+      where: { id },
+    });
+    res.status(200).json({ message: "Poster nr. ${id} er slette" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Kunne ikke slette poster" });
+  }
 };

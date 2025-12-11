@@ -1,14 +1,20 @@
 import { Request, Response } from "express";
 import { prisma } from "../prisma.js";
-import bcrypt from "bcrypt";
+
+/**
+ * Method Get Records
+ * @param req
+ * @param res
+ * @returns Array
+ */
 
 export const getRecords = async (req: Request, res: Response) => {
   try {
-    const data = await prisma.user.findMany();
+    const data = await prisma.genre.findMany();
     res.json(data);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Failed to fetch users" });
+    res.status(500).json({ error: "Failed to fetch genrelist" });
   }
 };
 
@@ -20,19 +26,43 @@ export const getRecords = async (req: Request, res: Response) => {
  */
 
 export const getRecord = async (req: Request, res: Response) => {
-  const id = Number(req.params.id);
-  if (!id) {
-    return res.status(400).json({ error: "Id is missing" });
+  const slug = req.params.slug;
+  if (!slug) {
+    return res.status(400).json({ error: "Slug is missing" });
   }
 
   try {
-    const data = await prisma.user.findUnique({
-      where: { id },
+    const data = await prisma.genre.findFirst({
+      where: { slug },
+      select: {
+        title: true,
+        slug: true,
+        posters: {
+          select: {
+            poster: {
+              select: {
+                id: true,
+                name: true,
+                slug: true,
+                image: true,
+                price: true,
+                stock: true,
+              },
+            },
+          },
+        },
+      },
     });
-    return res.status(200).json(data);
+
+    const result = {
+      ...data,
+      posters: data?.posters.map((rel) => rel.poster),
+    };
+
+    return res.status(200).json(result);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Failed to fetch user" });
+    res.status(500).json({ error: "Failed to fetch genre" });
   }
 };
 /** * Method Create Record
@@ -42,21 +72,16 @@ export const getRecord = async (req: Request, res: Response) => {
  */
 
 export const createRecord = async (req: Request, res: Response) => {
-  const { firstName, lastName, email, password, role, isActive } = req.body;
+  const { title, slug } = req.body;
 
-  if (!firstName || !lastName || !email || !password || !role || !isActive) {
+  if (!title || !slug) {
     return res.status(400).json({ error: "All data is required" });
   }
   try {
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const data = await prisma.user.create({
+    const data = await prisma.genre.create({
       data: {
-        firstName,
-        lastName,
-        email,
-        password: hashedPassword,
-        role,
-        isActive: Boolean(isActive),
+        title,
+        slug,
       },
     });
     res.status(201).json(data);
@@ -73,26 +98,22 @@ export const createRecord = async (req: Request, res: Response) => {
 
 export const updateRecord = async (req: Request, res: Response) => {
   const id = Number(req.params.id); // Sikrer at id er et tal
-  const { firstName, lastName, email, password, role, isActive } = req.body;
+  const { title, slug } = req.body;
 
   if (!id) {
     return res.status(400).json({ error: "Id skal have en gyldig værdi" });
   }
 
-  if (!firstName || !lastName || !email || !password || !role || !isActive) {
+  if (!title || !slug) {
     return res.status(400).json({ error: "Alle felter skal udfyldes" });
   }
 
   try {
-    const data = await prisma.user.update({
+    const data = await prisma.genre.update({
       where: { id },
       data: {
-        firstName,
-        lastName,
-        email,
-        password,
-        role,
-        isActive: Boolean(isActive),
+        title,
+        slug,
       },
     });
     res.status(201).json(data);
@@ -107,5 +128,14 @@ export const deleteRecord = async (req: Request, res: Response) => {
 
   if (!id) {
     return res.status(400).json({ error: "Id er savnet" });
+  }
+  try {
+    await prisma.genre.delete({
+      where: { id },
+    });
+    res.status(200).json({ message: "genre nr. ${id} er slette" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Kunne ikke slet genre" });
   }
 };

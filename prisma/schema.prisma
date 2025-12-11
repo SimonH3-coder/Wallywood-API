@@ -13,7 +13,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Cartlines {
+model Cartline {
   id        Int      @id @default(autoincrement())
   userId    Int
   posterId  Int
@@ -30,15 +30,15 @@ enum Role {
 
 model User {
   id        Int      @id @default(autoincrement())
-  firstName String
-  lastName  String
+  firstname String
+  lastname  String
   email     String   @unique
   password  String
   role      Role
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
 
-  ratings userRatings[]
+  ratings userRating[]
 
   @@map("users")
 }
@@ -56,13 +56,13 @@ model Poster {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  genreRels genrePosterRels[]
-  ratings   userRatings[]
+  genreRels GenrePosterRel[]
+  ratings   userRating[]
 
   @@map("posters")
 }
 
-model userRatings {
+model userRating {
   id        Int      @id @default(autoincrement())
   userId    Int
   posterId  Int
@@ -75,25 +75,25 @@ model userRatings {
   @@map("user_ratings")
 }
 
-model Genres {
+model Genre {
   id        Int      @id @default(autoincrement())
   title     String
   slug      String   @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  posters genrePosterRels[]
+  posters GenrePosterRel[]
 
   @@map("genres")
 }
 
-model genrePosterRels {
+model GenrePosterRel {
   genreId  Int
   posterId Int
 
-  genre  Genres @relation(fields: [genreId], references: [id])
+  genre  Genre @relation(fields: [genreId], references: [id])
   poster Poster @relation(fields: [posterId], references: [id])
 
-  @@id([genreId, posterId])
-  @@map("genre_poster_rels")
+  @@id([genreId, posterId]) // composite primary key
+  @@map("genreposterrels")
 }

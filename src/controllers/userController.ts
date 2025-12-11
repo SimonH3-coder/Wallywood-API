@@ -1,9 +1,10 @@
 import { Request, Response } from "express";
 import { prisma } from "../prisma.js";
+import bcrypt from "bcrypt";
 
 export const getRecords = async (req: Request, res: Response) => {
   try {
-    const data = await prisma.userRatings.findMany();
+    const data = await prisma.user.findMany();
     res.json(data);
   } catch (error) {
     console.error(error);
@@ -25,7 +26,7 @@ export const getRecord = async (req: Request, res: Response) => {
   }
 
   try {
-    const data = await prisma.userRatings.findUnique({
+    const data = await prisma.user.findUnique({
       where: { id },
     });
     return res.status(200).json(data);
@@ -41,18 +42,21 @@ export const getRecord = async (req: Request, res: Response) => {
  */
 
 export const createRecord = async (req: Request, res: Response) => {
-  const { userId, posterId, numStars, createdAt } = req.body;
+  const { firstname, lastname, email, password, role, isActive } = req.body;
 
-  if (!userId || !posterId || !numStars || !createdAt) {
+  if (!firstname || !lastname || !email || !password || !role || !isActive) {
     return res.status(400).json({ error: "All data is required" });
   }
   try {
-    const data = await prisma.userRatings.create({
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const data = await prisma.user.create({
       data: {
-        userId: Number(userId),
-        posterId: Number(posterId),
-        numStars: Number(numStars),
-        createdAt: new Date(createdAt),
+        firstname,
+        lastname,
+        email,
+        password: hashedPassword,
+        role,
+        isActive: Boolean(isActive),
       },
     });
     res.status(201).json(data);
@@ -69,24 +73,26 @@ export const createRecord = async (req: Request, res: Response) => {
 
 export const updateRecord = async (req: Request, res: Response) => {
   const id = Number(req.params.id); // Sikrer at id er et tal
-  const { userId, posterId, numStars, createad } = req.body;
+  const { firstname, lastname, email, password, role, isActive } = req.body;
 
   if (!id) {
     return res.status(400).json({ error: "Id skal have en gyldig værdi" });
   }
 
-  if (!userId || !posterId || !numStars || !createad) {
+  if (!firstname || !lastname || !email || !password || !role || !isActive) {
     return res.status(400).json({ error: "Alle felter skal udfyldes" });
   }
 
   try {
-    const data = await prisma.userRatings.update({
+    const data = await prisma.user.update({
       where: { id },
       data: {
-        userId: Number(userId),
-        posterId: Number(posterId),
-        numStars: Number(numStars),
-        createdAt: new Date(createad),
+        firstname,
+        lastname,
+        email,
+        password,
+        role,
+        isActive: Boolean(isActive),
       },
     });
     res.status(201).json(data);
@@ -101,5 +107,14 @@ export const deleteRecord = async (req: Request, res: Response) => {
 
   if (!id) {
     return res.status(400).json({ error: "Id er savnet" });
+  }
+  try {
+    await prisma.user.delete({
+      where: { id },
+    });
+    res.status(200).json({ message: "User nr. ${id} er slette" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Kunne ikke slette user" });
   }
 };

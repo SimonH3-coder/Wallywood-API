@@ -3,7 +3,7 @@ import { prisma } from "../prisma.js";
 
 export const getRecords = async (req: Request, res: Response) => {
   try {
-    const data = await prisma.genres.findMany();
+    const data = await prisma.cartline.findMany();
     res.json(data);
   } catch (error) {
     console.error(error);
@@ -25,7 +25,7 @@ export const getRecord = async (req: Request, res: Response) => {
   }
 
   try {
-    const data = await prisma.genres.findUnique({
+    const data = await prisma.cartline.findUnique({
       where: { id },
     });
     return res.status(200).json(data);
@@ -41,16 +41,18 @@ export const getRecord = async (req: Request, res: Response) => {
  */
 
 export const createRecord = async (req: Request, res: Response) => {
-  const { title, slug } = req.body;
+  const { userId, posterId, quantity, createdAt } = req.body;
 
-  if (!title || !slug) {
+  if (!userId || !posterId || !quantity || !createdAt) {
     return res.status(400).json({ error: "All data is required" });
   }
   try {
-    const data = await prisma.genres.create({
+    const data = await prisma.cartline.create({
       data: {
-        title,
-        slug,
+        userId: Number(userId),
+        posterId: Number(posterId),
+        quantity: Number(quantity),
+        createdAt: new Date(createdAt),
       },
     });
     res.status(201).json(data);
@@ -67,22 +69,24 @@ export const createRecord = async (req: Request, res: Response) => {
 
 export const updateRecord = async (req: Request, res: Response) => {
   const id = Number(req.params.id); // Sikrer at id er et tal
-  const { title, slug } = req.body;
+  const { userId, posterId, quantity, createdAt } = req.body;
 
   if (!id) {
     return res.status(400).json({ error: "Id skal have en gyldig værdi" });
   }
 
-  if (!title || !slug) {
+  if (!userId || !posterId || !quantity || !createdAt) {
     return res.status(400).json({ error: "Alle felter skal udfyldes" });
   }
 
   try {
-    const data = await prisma.genres.update({
+    const data = await prisma.cartline.update({
       where: { id },
       data: {
-        title,
-        slug,
+        userId: Number(userId),
+        posterId: Number(posterId),
+        quantity: Number(quantity),
+        createdAt: new Date(createdAt),
       },
     });
     res.status(201).json(data);
@@ -97,5 +101,14 @@ export const deleteRecord = async (req: Request, res: Response) => {
 
   if (!id) {
     return res.status(400).json({ error: "Id er savnet" });
+  }
+  try {
+    await prisma.cartline.delete({
+      where: { id },
+    });
+    res.status(200).json({ message: "Cartline nr. ${id} er slette" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Kunne ikke cartline" });
   }
 };

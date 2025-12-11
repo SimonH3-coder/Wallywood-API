@@ -9,7 +9,7 @@ export const fieldTypes: Record<string, Record<string, "string" | "number" | "bo
     isActive: "boolean",
   },
   // Her kommer næste model
-  cartlines: {
+  cartline: {
     id: "number",
     userId: "number",
     posterId: "number",
@@ -23,12 +23,15 @@ export const fieldTypes: Record<string, Record<string, "string" | "number" | "bo
     slug: "string",
     description: "string",
     image: "string",
+    width: "number",
+    height: "number",
+    stock: "number",
     price: "number",
     createdAt: "date",
     updatedAt: "date",
   },
   // Her kommer næste model
-  userRatings: {
+  userRating: {
     id: "number",
     userId: "number",
     posterId: "number",
@@ -36,15 +39,15 @@ export const fieldTypes: Record<string, Record<string, "string" | "number" | "bo
     createdAt: "date",
   },
   // Her kommer næste model
-  genres: {
+  genre: {
     id: "number",
     title: "string",
     slug: "string",
-    created: "date",
-    updated: "date",
+    createdAt: "date",
+    updatedAt: "date",
   },
   // Her kommer næste model
-  genrePosterRels: {
+  genrePosterRel: {
     id: "number",
     genreId: "number",
     posterId: "number",
